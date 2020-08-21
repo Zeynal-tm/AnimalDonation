@@ -1,0 +1,19 @@
+﻿@model AnimalDonation.Controllers.HomeController
+
+
+<div class="row">
+    <div class="col-md-4">
+        <form method="post" asp-action="GetStatus">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <input type="submit" value="Get Status" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
+
