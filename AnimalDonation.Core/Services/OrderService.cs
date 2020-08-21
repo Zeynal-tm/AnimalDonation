@@ -86,14 +86,8 @@ namespace AnimalDonation.Core.Services
 
             var result = await response.Content.ReadAsStringAsync();
 
-            var res = SimpleJson.DeserializeObject<OrderRegistrationResponse>(result);
+            return SimpleJson.DeserializeObject<OrderRegistrationResponse>(result);
 
-            var resp = new Order
-            {
-                PaymentSystemOrderId = res.orderId,
-            };
-
-            return res;
         }
 
         //----------------------------------------------------------------------------------------------------------------------------------------------------
