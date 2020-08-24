@@ -46,24 +46,24 @@ namespace AnimalDonation.Controllers
             }
         }
 
-        public  IActionResult Status()
+        public IActionResult Status(string orderId)
         {
+            ViewData["orderId"] = orderId;
             return View();
         }
 
 
         [HttpPost]
-        public async Task<IActionResult> GetStatus()                
+        public async Task<IActionResult> GetStatus(string orderId)                
         {
-            int successfulPayment = 2;
-            int successfulPaymentWithADelay = 8;
+            const int successfulPayment = 2;
 
             if (ModelState.IsValid)
             {
 
-                var result = await _orderService.RequestOrderStatus();             
+                var result = await _orderService.RequestOrderStatus(orderId);             
 
-                if (result.orderStatus == successfulPayment || result.orderStatus == successfulPaymentWithADelay)
+                if (result.orderStatus == successfulPayment)
                 {
                     return RedirectToAction(nameof(Donationers));
                 }

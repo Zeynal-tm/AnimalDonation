@@ -4,7 +4,7 @@ using System.Text;
 
 namespace AnimalDonation.Core.Classes
 {
-    public class OrderResponse
+    public class OrderRequest
     {
         public int Id { get; set; }
         public string UserName { get; set; }

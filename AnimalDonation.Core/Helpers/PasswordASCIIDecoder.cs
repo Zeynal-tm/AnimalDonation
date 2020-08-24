@@ -5,7 +5,7 @@ using System.Text;
 
 namespace AnimalDonation.Core.Helpers
 {
-    public class PasswordConvertor
+    public class PasswordASCIIDecoder
     {
         public static long Convert(string userName)
         {

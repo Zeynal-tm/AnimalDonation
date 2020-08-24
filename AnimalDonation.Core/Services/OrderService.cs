@@ -7,6 +7,7 @@ using AnimalDonation.DataAccessLayer.Entities;
 using AnimalDonation.DataAccessLayer.Interfaces;
 using AnimalDonation.DataAccessLayer.Repository;
 using AutoMapper;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
@@ -27,11 +28,12 @@ namespace AnimalDonation.Core.Services
         private readonly IConfiguration _configuration;
 
         IUnitOfWork Database { get; set; }
-
-        public OrderService(IConfiguration configuration, IUnitOfWork unitOfWork)
+        private readonly IHttpContextAccessor httpContext;
+        public OrderService(IConfiguration configuration, IUnitOfWork unitOfWork, IHttpContextAccessor httpContext)
         {
             _configuration = configuration;
             Database = unitOfWork;
+            this.httpContext = httpContext;
         }
 
         public async Task<OrderRegistrationResponse> CreateOrder(int amount, string description)
@@ -60,7 +62,8 @@ namespace AnimalDonation.Core.Services
 
         private async Task<OrderRegistrationResponse> RegisterOrderInPaymentSystem(Order order)
         {
-            var returnUrl = _configuration["Urls:Return"];
+            var httpRequest = httpContext.HttpContext.Request;
+            var returnUrl = httpRequest.Scheme + "://" + httpRequest.Host.Value + "/Home/Status";
             var server = _configuration["Urls:Server"];
             var userName = _configuration["Position:Name"];
 
@@ -69,7 +72,7 @@ namespace AnimalDonation.Core.Services
             var request = new OrderRegistrationRequest
             {
                 UserName = userName,
-                Password = Convert.ToString(PasswordConvertor.Convert(userName)),
+                Password = Convert.ToString(PasswordASCIIDecoder.Convert(userName)),
                 OrderNumber = Convert.ToString(Guid.NewGuid()),
                 ReturnUrl = returnUrl,
                 Amount = order.Amount,
@@ -93,7 +96,7 @@ namespace AnimalDonation.Core.Services
         //----------------------------------------------------------------------------------------------------------------------------------------------------
 
 
-        public async Task<OrderStatusResponse> RequestOrderStatus()
+        public async Task<OrderStatusResponse> RequestOrderStatus(string orderId)
         {
             var client = new HttpClient();
 
@@ -101,15 +104,13 @@ namespace AnimalDonation.Core.Services
             var userName = _configuration["Position:Name"];
 
 
-            var getDonater = GetDonationers();
-            var lastDonater = getDonater.LastOrDefault();
+            var getIDForOrderRequest = GetDonationer(orderId);
 
-
-            var request = new OrderResponse
+            var request = new OrderRequest
             {
                 UserName = _configuration["Position:Name"],
-                Password = Convert.ToString(PasswordConvertor.Convert(userName)),
-                orderId = lastDonater.PaymentSystemOrderId
+                Password = Convert.ToString(PasswordASCIIDecoder.Convert(userName)),
+                orderId = getIDForOrderRequest.PaymentSystemOrderId
             };
 
             var json = JsonConvert.SerializeObject(request);
@@ -121,18 +122,38 @@ namespace AnimalDonation.Core.Services
 
             var result = await response.Content.ReadAsStringAsync();
 
-            return SimpleJson.DeserializeObject<OrderStatusResponse>(result);
+            var status = SimpleJson.DeserializeObject<OrderStatusResponse>(result);
+
+            var getIDForStatusPosition = Database.Orders.Get(request.orderId);
+
+            if (status.orderStatus == 2)
+            {
+                getIDForStatusPosition.Paid = true;
+
+                Database.Orders.Update(getIDForStatusPosition);
+                await Database.SaveAsync();
+            }
+
+            return status;
         }
+
+        public OrderDTO GetDonationer(string orderId)
+        {
+            var order = Database.Orders.GetAll().FirstOrDefault(item => item.PaymentSystemOrderId == orderId);
+            var mapper = new MapperConfiguration(cfg => cfg.CreateMap<Order, OrderDTO>()).CreateMapper();
+            return mapper.Map<OrderDTO>(order);
+        }
+
 
 
         //----------------------------------------------------------------------------------------------------------------------------------------------------
 
-
         public IEnumerable<OrderDTO> GetDonationers()
         {
             var mapper = new MapperConfiguration(cfg => cfg.CreateMap<Order, OrderDTO>()).CreateMapper();
-            return mapper.Map<IEnumerable<Order>, List<OrderDTO>>(Database.Orders.GetAll());
+            var map = mapper.Map<IEnumerable<Order>, List<OrderDTO>>(Database.Orders.GetAll());
+            var get = map.FindAll(s => s.Paid == true);
+            return get;
         }
-
     }
 }

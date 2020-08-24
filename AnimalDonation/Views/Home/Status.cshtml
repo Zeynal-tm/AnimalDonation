@@ -3,7 +3,7 @@
 
 <div class="row">
     <div class="col-md-4">
-        <form method="post" asp-action="GetStatus">
+        <form method="post" asp-action="GetStatus" asp-route-orderId="@ViewData["orderId"]">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
                 <input type="submit" value="Get Status" class="btn btn-primary" />

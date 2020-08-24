@@ -24,16 +24,15 @@ namespace AnimalDonation.DataAccessLayer.Repository
             context.Orders.Add(item);
         }
 
-        public Order Get(int id)
+        public Order Get(string id)
         {
-            return context.Orders.Find(id);
+            return context.Orders.First(item => item.PaymentSystemOrderId == id);
         }
 
         public IEnumerable<Order> GetAll()
         {
             return context.Orders;
         }
-
 
         public void Update(Order item)
         {

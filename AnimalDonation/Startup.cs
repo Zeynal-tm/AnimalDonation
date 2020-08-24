@@ -33,6 +33,8 @@ namespace AnimalDonation
             services.AddTransient<IOrderService ,OrderService>();
             services.AddTransient<IUnitOfWork, EFUnitOfWork>();
 
+            services.AddHttpContextAccessor();
+
             services.AddDbContext<DatabaseContext>(options =>
             {
                 options.UseSqlServer(Configuration.GetConnectionString("Animal"));

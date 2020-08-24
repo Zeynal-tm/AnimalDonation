@@ -9,7 +9,7 @@ namespace AnimalDonation.Core.Interfaces
     {
         Task<OrderRegistrationResponse> CreateOrder(int amount, string description);
 
-        Task<OrderStatusResponse> RequestOrderStatus();
+        Task<OrderStatusResponse> RequestOrderStatus(string orderId);
 
         IEnumerable<OrderDTO> GetDonationers();
     }
