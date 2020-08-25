@@ -7,7 +7,7 @@ namespace AnimalDonation.Core.Helpers
 {
     public class PasswordASCIIDecoder
     {
-        public static long Convert(string userName)
+        public static long ASCIIDecoder(string userName)
         {
             string str = userName + "-spasem-mir";
 

@@ -2,6 +2,7 @@
 using AnimalDonation.DataAccessLayer.Entities;
 using AnimalDonation.DataAccessLayer.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -32,6 +33,11 @@ namespace AnimalDonation.DataAccessLayer.Repository
         public IEnumerable<Order> GetAll()
         {
             return context.Orders;
+        }
+
+        public IEnumerable<Order> GetAllPaidOrders()
+        {
+            return context.Orders.Where(item => item.Paid);
         }
 
         public void Update(Order item)

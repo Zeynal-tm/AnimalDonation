@@ -21,15 +21,13 @@ namespace AnimalDonation.Controllers
             _orderService = order;
         }
 
-        [HttpGet]
         public IActionResult CreateDonation()
         {
             return View();
         }
 
-
         [HttpPost]
-        public async Task<IActionResult> CreateDonation([Range(1, 1000)] int amount, string description)
+        public async Task<IActionResult> CreateDonation([Range(1, 10000)]int amount, string description)
         {
             if (ModelState.IsValid)
             {
@@ -40,52 +38,29 @@ namespace AnimalDonation.Controllers
                 }
                 return View("Error");
             }
+            return View();
+        }
+
+
+
+        public async Task<IActionResult> Status(string orderId)
+        {
+
+            const int successfulPayment = 2;
+
+            var result = await _orderService.RequestOrderStatus(orderId);
+
+            if (result.orderStatus == successfulPayment)
+            {
+                return RedirectToAction(nameof(CreateDonation));
+            }
             else
             {
                 return RedirectToAction(nameof(Error));
             }
         }
 
-        public IActionResult Status(string orderId)
-        {
-            ViewData["orderId"] = orderId;
-            return View();
-        }
 
-
-        [HttpPost]
-        public async Task<IActionResult> GetStatus(string orderId)                
-        {
-            const int successfulPayment = 2;
-
-            if (ModelState.IsValid)
-            {
-
-                var result = await _orderService.RequestOrderStatus(orderId);             
-
-                if (result.orderStatus == successfulPayment)
-                {
-                    return RedirectToAction(nameof(Donationers));
-                }
-                else
-                {
-                    return RedirectToAction(nameof(Error));
-                }
-            }
-            return null;
-        }
-
-
-        public IActionResult Donationers()
-        {
-            IEnumerable<OrderDTO> orderDTOs = _orderService.GetDonationers();
-            var mappar = new MapperConfiguration(cfg => cfg.CreateMap<OrderDTO, OrderViewModel>()).CreateMapper();
-            var orders = mappar.Map<IEnumerable<OrderDTO>, List<OrderViewModel>>(orderDTOs);
-            return View(orders);
-        }
-
-        
-        
         public IActionResult Privacy()
         {
             return View();

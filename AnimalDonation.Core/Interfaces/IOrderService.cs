@@ -1,6 +1,7 @@
 ﻿using AnimalDonation.Core.Classes;
 using AnimalDonation.DataAccessLayer.Entities;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace AnimalDonation.Core.Interfaces
@@ -11,6 +12,6 @@ namespace AnimalDonation.Core.Interfaces
 
         Task<OrderStatusResponse> RequestOrderStatus(string orderId);
 
-        IEnumerable<OrderDTO> GetDonationers();
+        IEnumerable<OrderDTO> GetPaidDonationers();
     }
 }

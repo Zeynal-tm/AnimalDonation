@@ -1,5 +1,4 @@
-﻿
-@model AnimalDonation.Models.OrderViewModel
+﻿@model AnimalDonation.Models.OrderViewModel
 
 
 <h1>
@@ -28,9 +27,21 @@
 </div>
 
 
-@section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
-}
+
+@*<div>
+    @await Component.InvokeAsync("DonatorsList")
+</div>*@
+
+
+<div>
+    <vc:donators-list />
+</div>
+
+
+
+    @section Scripts {
+        @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    }
 
 
 @*asp-action="CreateDonation" asp-controller="Donation"*@

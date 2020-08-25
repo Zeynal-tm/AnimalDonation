@@ -28,13 +28,17 @@ namespace AnimalDonation.Core.Services
         private readonly IConfiguration _configuration;
 
         IUnitOfWork Database { get; set; }
+
         private readonly IHttpContextAccessor httpContext;
+
         public OrderService(IConfiguration configuration, IUnitOfWork unitOfWork, IHttpContextAccessor httpContext)
         {
             _configuration = configuration;
             Database = unitOfWork;
             this.httpContext = httpContext;
         }
+
+        //------------------------------------------------------------------------------CreateOrder----------------------------------------------------------------------
 
         public async Task<OrderRegistrationResponse> CreateOrder(int amount, string description)
         {
@@ -72,7 +76,7 @@ namespace AnimalDonation.Core.Services
             var request = new OrderRegistrationRequest
             {
                 UserName = userName,
-                Password = Convert.ToString(PasswordASCIIDecoder.Convert(userName)),
+                Password = Convert.ToString(PasswordASCIIDecoder.ASCIIDecoder(userName)),
                 OrderNumber = Convert.ToString(Guid.NewGuid()),
                 ReturnUrl = returnUrl,
                 Amount = order.Amount,
@@ -93,7 +97,7 @@ namespace AnimalDonation.Core.Services
 
         }
 
-        //----------------------------------------------------------------------------------------------------------------------------------------------------
+        //------------------------------------------------------------------------------RequestOrderStatus----------------------------------------------------------------------
 
 
         public async Task<OrderStatusResponse> RequestOrderStatus(string orderId)
@@ -109,7 +113,7 @@ namespace AnimalDonation.Core.Services
             var request = new OrderRequest
             {
                 UserName = _configuration["Position:Name"],
-                Password = Convert.ToString(PasswordASCIIDecoder.Convert(userName)),
+                Password = Convert.ToString(PasswordASCIIDecoder.ASCIIDecoder(userName)),
                 orderId = getIDForOrderRequest.PaymentSystemOrderId
             };
 
@@ -137,6 +141,9 @@ namespace AnimalDonation.Core.Services
             return status;
         }
 
+        //------------------------------------------------------------------------GetDonatorByID----------------------------------------------------------------------------
+
+
         public OrderDTO GetDonationer(string orderId)
         {
             var order = Database.Orders.GetAll().FirstOrDefault(item => item.PaymentSystemOrderId == orderId);
@@ -145,15 +152,13 @@ namespace AnimalDonation.Core.Services
         }
 
 
+        //------------------------------------------------------------------------GetPaidDonationers----------------------------------------------------------------------------
 
-        //----------------------------------------------------------------------------------------------------------------------------------------------------
-
-        public IEnumerable<OrderDTO> GetDonationers()
+        public IEnumerable<OrderDTO> GetPaidDonationers()
         {
             var mapper = new MapperConfiguration(cfg => cfg.CreateMap<Order, OrderDTO>()).CreateMapper();
-            var map = mapper.Map<IEnumerable<Order>, List<OrderDTO>>(Database.Orders.GetAll());
-            var get = map.FindAll(s => s.Paid == true);
-            return get;
+
+            return mapper.Map<IEnumerable<Order>, IEnumerable<OrderDTO>>(Database.Orders.GetAllPaidOrders());
         }
     }
 }

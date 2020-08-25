@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace AnimalDonation.Core.Classes
 {
@@ -10,6 +8,15 @@ namespace AnimalDonation.Core.Classes
         public int Amount { get; set; }
         public string Description { get; set; }
         public string PaymentSystemOrderId { get; set; }
-        public bool Paid { get; set; }
+
+        public decimal Price
+        {
+            get
+            {
+                return (decimal)Amount / 100;
+            }
+        }
+
+        public string Currency => $"{Price} TMT";
     }
 }
