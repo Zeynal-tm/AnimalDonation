@@ -14,6 +14,7 @@ using Microsoft.EntityFrameworkCore;
 using AnimalDonation.Core.Services;
 using AnimalDonation.Core.Interfaces;
 using AnimalDonation.DataAccessLayer.Repository;
+using FluentValidation.AspNetCore;
 
 namespace AnimalDonation
 {
@@ -29,7 +30,14 @@ namespace AnimalDonation
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddControllersWithViews();
+            services.AddControllersWithViews()
+                 .AddFluentValidation(s =>
+                 {
+                     s.RegisterValidatorsFromAssemblyContaining<Startup>();
+                     s.RunDefaultMvcValidationAfterFluentValidationExecutes = false;
+                 });
+
+
             services.AddTransient<IOrderService ,OrderService>();
             services.AddTransient<IUnitOfWork, EFUnitOfWork>();
 

@@ -9,7 +9,6 @@ namespace AnimalDonation.DataAccessLayer.Interfaces
     public interface IUnitOfWork 
     {
         IOrderRepository<Order> Orders { get; }
-
         void Save();
         Task SaveAsync();
     }

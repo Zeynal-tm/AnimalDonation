@@ -2,7 +2,10 @@
 using AnimalDonation.Core.Interfaces;
 using AnimalDonation.DataAccessLayer.Entities;
 using AnimalDonation.Models;
+using AnimalDonation.Validations;
 using AutoMapper;
+using FluentValidation;
+using FluentValidation.Results;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -16,6 +19,8 @@ namespace AnimalDonation.Controllers
     {
         private readonly IOrderService _orderService;
 
+       
+
         public HomeController(IOrderService order)
         {
             _orderService = order;
@@ -26,9 +31,18 @@ namespace AnimalDonation.Controllers
             return View();
         }
 
+
+
+
         [HttpPost]
-        public async Task<IActionResult> CreateDonation([Range(1, 10000)]int amount, string description)
+        public async Task<IActionResult> CreateDonation(int amount, string description, OrderViewModel order)
         {
+            if (!ModelState.IsValid)
+            { // re-render the view when validation failed.
+                return View("CreateDonation", order);
+            }
+
+
             if (ModelState.IsValid)
             {
                 var result = await _orderService.CreateOrder(amount, description);

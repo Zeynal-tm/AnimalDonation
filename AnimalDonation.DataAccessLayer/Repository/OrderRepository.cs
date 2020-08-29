@@ -1,6 +1,7 @@
 ﻿using AnimalDonation.DataAccessLayer.Context;
 using AnimalDonation.DataAccessLayer.Entities;
 using AnimalDonation.DataAccessLayer.Interfaces;
+using AnimalDonation.DataAccessLayer.Specifications;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 using System;

@@ -6,6 +6,7 @@ using AnimalDonation.DataAccessLayer.Context;
 using AnimalDonation.DataAccessLayer.Entities;
 using AnimalDonation.DataAccessLayer.Interfaces;
 using AnimalDonation.DataAccessLayer.Repository;
+using AnimalDonation.DataAccessLayer.Specifications;
 using AutoMapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
@@ -38,6 +39,8 @@ namespace AnimalDonation.Core.Services
             this.httpContext = httpContext;
         }
 
+
+
         //------------------------------------------------------------------------------CreateOrder----------------------------------------------------------------------
 
         public async Task<OrderRegistrationResponse> CreateOrder(int amount, string description)
@@ -63,6 +66,7 @@ namespace AnimalDonation.Core.Services
 
             return result;
         }
+
 
         private async Task<OrderRegistrationResponse> RegisterOrderInPaymentSystem(Order order)
         {
